@@ -75,13 +75,17 @@ Rcon = (
 
 
 def text2matrix(text):
+    """
+    平文を変換する
+    i/4 -> i//4　に変更
+    """
     matrix = []
     for i in range(16):
         byte = (text >> (8 * (15 - i))) & 0xFF
         if i % 4 == 0:
             matrix.append([byte])
         else:
-            matrix[i / 4].append(byte)
+            matrix[i // 4].append(byte)
     return matrix
 
 
@@ -152,6 +156,9 @@ class AES:
         return matrix2text(self.cipher_state)
 
     def __add_round_key(self, s, k):
+        """
+        ラウンド鍵とのXOR
+        """
         for i in range(4):
             for j in range(4):
                 s[i][j] ^= k[i][j]
@@ -169,6 +176,9 @@ class AES:
         self.__inv_sub_bytes(state_matrix)
 
     def __sub_bytes(self, s):
+        """
+        S boxによる1byte単位の変換
+        """
         for i in range(4):
             for j in range(4):
                 s[i][j] = Sbox[s[i][j]]
@@ -179,6 +189,9 @@ class AES:
                 s[i][j] = InvSbox[s[i][j]]
 
     def __shift_rows(self, s):
+        """
+        4byte単位の行を法則によって左シフト
+        """
         s[0][1], s[1][1], s[2][1], s[3][1] = s[1][1], s[2][1], s[3][1], s[0][1]
         s[0][2], s[1][2], s[2][2], s[3][2] = s[2][2], s[3][2], s[0][2], s[1][2]
         s[0][3], s[1][3], s[2][3], s[3][3] = s[3][3], s[0][3], s[1][3], s[2][3]
@@ -198,6 +211,9 @@ class AES:
         a[3] ^= t ^ xtime(a[3] ^ u)
 
     def __mix_columns(self, s):
+        """
+        bit演算による4byte単位の行列変換
+        """
         for i in range(4):
             self.__mix_single_column(s[i])
 
